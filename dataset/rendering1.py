@@ -1,6 +1,5 @@
 import bpy, bpy_extras, sys, os
 
-from mathutils import *
 from math import *
 
 root = '/home/alya/work/sketch/dataset/'
