@@ -2,16 +2,18 @@ import bpy, bpy_extras, sys, os
 
 from math import *
 
-root = '/home/alya/work/sketch/dataset/'
+scene = bpy.context.scene
+for ob in scene.objects:
+   bpy.data.objects.remove(ob)
+
+root = '/home/alya/work/sketch/repo/dataset/'
 bpy.ops.import_scene.fbx(filepath = root + 'spin.fbx', use_anim=True)
 animation = bpy.context.object
 bpy.ops.import_scene.fbx(filepath = root + 'model.fbx')
 model = bpy.context.object
 
-scene = bpy.context.scene
-
-scene.frame_start = 65
-scene.frame_end = 70
+scene.frame_start = 60
+scene.frame_end = 80
 
 for ob in scene.objects:
     if ob.type == 'ARMATURE' or ob.type == 'MESH':
@@ -22,11 +24,10 @@ bpy.context.view_layer.objects.active = animation
 bpy.ops.object.make_links_data(type='ANIMATION')
 
 bpy.ops.object.camera_add(align='VIEW', rotation=[pi / 2, 0, 0.03 * pi])
-#bpy.ops.object.camera_add(align='VIEW', rotation=[pi / 2, 0, 0.6 * pi])
+bpy.ops.object.camera_add(align='VIEW', rotation=[pi / 2, 0, 0.6 * pi])
 
-# bpy.ops.object.camera_add(align='VIEW', rotation=[pi / 2, 0, 0.95 * pi])
-# bpy.ops.object.camera_add(align='VIEW', rotation=[pi / 2, 0, 1.36 * pi])
-
+bpy.ops.object.camera_add(align='VIEW', rotation=[pi / 2, 0, 0.95 * pi])
+bpy.ops.object.camera_add(align='VIEW', rotation=[pi / 2, 0, 1.36 * pi])
 
 def good_bone_name(x):
     x = x[10:]
@@ -59,13 +60,33 @@ not_skeleton_bones = ['HandThumb', 'HandIndex', 'HandMiddle', 'HandRing', 'HandP
 
 cameras = []
 for ob in scene.objects:
-    print(ob)
     if ob.type == 'ARMATURE' or ob.type == 'MESH':
         ob.select_set(True)
-        # ob.hide_render = True
+        if ob.type == 'MESH':
+            ob.active_material.alpha_threshold = 10000
+            ob.active_material.blend_method = 'CLIP'
+            ob.active_material.shadow_method = 'CLIP'
+            ob.active_material.use_backface_culling = True
+            ob.show_transparent = True
+        else:
+            ob.hide_render = True
 
     if ob.type == 'CAMERA':
         cameras.append(ob)
+
+freestyle = bpy.context.scene.view_layers["View Layer"].freestyle_settings
+scene.render.use_freestyle = True
+scene.render.line_thickness = 1
+
+linesets = freestyle.linesets.new('VisibleLineset')
+
+linesets.select_by_visibility = True
+linesets.select_by_edge_types = True
+linesets.select_by_image_border = True
+
+linesets.select_silhouette = True
+linesets.select_border = True
+linesets.select_crease = True
 
 render_size = (
     int(scene.render.resolution_x),
@@ -90,12 +111,12 @@ for frame in range(scene.frame_start, scene.frame_end):
                             round((1 - coords_2d[1]) * render_size[1]),
                         )
                         f.write(f'{b.name} {coords_pixel[0]} {coords_pixel[1]}\n')
-                        # f.write(f'{b.name} {coords_2d[0] / coords_2d[2]} {coords_2d[1] / coords_2d[2]}\n')
         f.write('\n')
         f.close()
 
         file = os.path.join(root + 'renders/', f'{camera_num}_{frame}')
-        bpy.context.scene.render.filepath = file
+        scene.render.film_transparent = True
+        scene.render.filepath = file
         bpy.ops.render.render(write_still=True)
 
 for ob in scene.objects:
