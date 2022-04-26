@@ -13,6 +13,7 @@ import os
 import pprint
 import shutil
 
+import wandb
 import torch
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -105,6 +106,8 @@ def main():
         'valid_global_steps': 0,
     }
 
+    wandb.init(project='sketch')
+
     dump_input = torch.rand(
         (1, 3, cfg.MODEL.IMAGE_SIZE[1], cfg.MODEL.IMAGE_SIZE[0])
     )
@@ -123,20 +126,28 @@ def main():
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     )
-    train_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
-        cfg, cfg.DATASET.ROOT, cfg.DATASET.TRAIN_SET, True,
-        transforms.Compose([
-            transforms.ToTensor(),
-            normalize,
-        ])
+
+    train_dataset = eval('dataset.' + 'united')(
+        cfg, False
     )
-    valid_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
-        cfg, cfg.DATASET.ROOT, cfg.DATASET.TEST_SET, False,
-        transforms.Compose([
-            transforms.ToTensor(),
-            normalize,
-        ])
+    valid_dataset = eval('dataset.' + 'united')(
+        cfg, True
     )
+
+    # train_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
+    #     cfg, cfg.DATASET.ROOT, cfg.DATASET.TRAIN_SET, True,
+    #     transforms.Compose([
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ])
+    # )
+    # valid_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
+    #     cfg, cfg.DATASET.ROOT, cfg.DATASET.TEST_SET, False,
+    #     transforms.Compose([
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ])
+    # )
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,

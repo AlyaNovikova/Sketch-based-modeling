@@ -14,6 +14,13 @@ import os
 
 import numpy as np
 import torch
+import torch.nn as nn
+import torch.backends.cudnn as cudnn
+import torch.optim
+import torch.utils.data
+import torch.utils.data.distributed
+import torchvision.transforms as transforms
+import wandb
 
 from core.evaluate import accuracy
 from core.inference import get_final_preds, get_max_preds
@@ -34,24 +41,35 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
     # switch to train mode
     model.train()
 
+    bce = nn.BCEWithLogitsLoss()
+    alpha = 1e-3
+
     end = time.time()
-    for i, (input, target, target_weight, meta) in enumerate(train_loader):
+
+    for i, (input, target, target_weight, domain) in enumerate(train_loader):
+
+        # input = input[domain == 1]
+        # target = target[domain == 1]
+        # target_weight = target_weight[domain == 1]
+        # meta = meta[domain == 1]
+
         # measure data loading time
+        # input
         data_time.update(time.time() - end)
 
         # compute output
-        outputs = model(input)
+        output, d_pred = model(input)
 
         target = target.cuda(non_blocking=True)
         target_weight = target_weight.cuda(non_blocking=True)
 
-        if isinstance(outputs, list):
-            loss = criterion(outputs[0], target, target_weight)
-            for output in outputs[1:]:
-                loss += criterion(output, target, target_weight)
-        else:
-            output = outputs
-            loss = criterion(output, target, target_weight)
+        loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+        loss2 = bce(output, target)
+        loss = loss1 + alpha * loss2
+        wandb.log(
+            {'train/pose_loss': loss1, 'train/discriminator': loss2, 'train/sum_loss': loss},
+            step=epoch * len(train_loader) + i
+        )
 
         # loss = criterion(output, target, target_weight)
 
@@ -90,8 +108,7 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
             writer_dict['train_global_steps'] = global_steps + 1
 
             prefix = '{}_{}'.format(os.path.join(output_dir, 'train'), i)
-            save_debug_images(config, input, meta, target, pred*4, output,
-                              prefix)
+            # save_debug_images(config, input, meta, target, pred*4, output, prefix)
 
 
 def validate(config, val_loader, val_dataset, model, criterion, output_dir,
