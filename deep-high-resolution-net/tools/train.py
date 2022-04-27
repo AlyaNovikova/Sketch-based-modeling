@@ -15,6 +15,7 @@ import shutil
 
 import wandb
 import torch
+import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
@@ -121,6 +122,8 @@ def main():
     criterion = JointsMSELoss(
         use_target_weight=cfg.LOSS.USE_TARGET_WEIGHT
     ).cuda()
+    bce = nn.BCEWithLogitsLoss()
+    alpha = 1e-3
 
     # Data loading code
     normalize = transforms.Normalize(
@@ -194,13 +197,13 @@ def main():
         lr_scheduler.step()
 
         # train for one epoch
-        train(cfg, train_loader, model, criterion, optimizer, epoch,
+        train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
               final_output_dir, tb_log_dir, writer_dict)
 
 
         # evaluate on validation set
         perf_indicator = validate(
-            cfg, valid_loader, valid_dataset, model, criterion,
+            cfg, valid_loader, valid_dataset, model, criterion, bce, alpha, epoch,
             final_output_dir, tb_log_dir, writer_dict
         )
 

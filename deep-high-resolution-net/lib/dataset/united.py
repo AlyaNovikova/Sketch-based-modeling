@@ -75,8 +75,8 @@ class UnitedDataset(Dataset):
         if idx < len(self.dataset):
             # input, target, target_weight, meta = self.dataset[idx]
             # return input, target, target_weight, meta, 1
-            input, target, target_weight = self.dataset[idx]
-            return input, target, target_weight, 1
+            input, target, target_weight, meta = self.dataset[idx]
+            return input, target, target_weight, meta, 1
 
         idx -= len(self.dataset)
         target_weight = np.ones((self.num_joints, 1), dtype=np.float32)
@@ -87,7 +87,19 @@ class UnitedDataset(Dataset):
         target = torch.from_numpy(target)
         target_weight = torch.from_numpy(target_weight)
 
-        return self.transform(self.gesture_images[idx]), target, target_weight, 0
+        meta = {
+            'image': '',
+            'filename': '',
+            'imgnum': 0,
+            'joints': np.zeros((self.num_joints, 3), dtype=np.float32),
+            'joints_vis': np.zeros((self.num_joints, 3), dtype=np.float32),
+            'center': [0, 0],
+            'scale': [0, 0],
+            'rotation': 0,
+            'score': 0
+        }
+
+        return self.transform(self.gesture_images[idx]), target, target_weight, meta, 0
         # return self.transform(self.gesture_images[idx]), target, target_weight, {}, 0
 
     def __len__(self):

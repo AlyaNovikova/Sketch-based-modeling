@@ -196,8 +196,8 @@ class JointsDataset(Dataset):
             'score': score
         }
 
-        return input, target, target_weight
-        # return input, target, target_weight, meta
+        # return input, target, target_weight
+        return input, target, target_weight, meta
 
     def select_data(self, db):
         db_selected = []
