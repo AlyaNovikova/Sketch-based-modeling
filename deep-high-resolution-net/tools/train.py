@@ -166,6 +166,17 @@ def main():
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY
     )
+    eval_loader = torch.utils.data.DataLoader(
+        valid_dataset,
+        batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
+        shuffle=True,
+        num_workers=cfg.WORKERS,
+        pin_memory=cfg.PIN_MEMORY
+    )
+    def infinite_iterator(loader):
+        while True:
+            yield from loader
+    eval_loader = infinite_iterator(eval_loader)
 
     best_perf = 0.0
     best_model = False
@@ -198,7 +209,7 @@ def main():
 
         # train for one epoch
         train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
-              final_output_dir, tb_log_dir, writer_dict)
+              final_output_dir, tb_log_dir, writer_dict, eval_loader)
 
 
         # evaluate on validation set

@@ -33,9 +33,6 @@ from utils.utils import get_model_summary
 import dataset
 import models
 
-
-
-
 class UnitedDataset(Dataset):
     def __init__(self, cfg, valid_flag):
         normalize = transforms.Normalize(
@@ -58,6 +55,8 @@ class UnitedDataset(Dataset):
 
         self.gesture_images = []
         for img_name in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir():
+            if img_name.is_dir():
+                continue
             img = cv2.imread(str(img_name))
             img = cv2.resize(img, cfg.MODEL.IMAGE_SIZE)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

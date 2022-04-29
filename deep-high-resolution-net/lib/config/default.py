@@ -22,6 +22,7 @@ _C.DATA_DIR = ''
 _C.GPUS = (0,)
 _C.WORKERS = 4
 _C.PRINT_FREQ = 20
+_C.EVAL_FREQ = 10
 _C.AUTO_RESUME = False
 _C.PIN_MEMORY = True
 _C.RANK = 0

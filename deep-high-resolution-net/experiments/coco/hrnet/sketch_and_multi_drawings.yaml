@@ -7,9 +7,10 @@ DATA_DIR: ''
 GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
-WORKERS: 24
+WORKERS: 8
 PRINT_FREQ: 100
-GESTURE_DRAWINGS_DIR: 'data/drawings/images/eval/'
+EVAL_FREQ: 10
+GESTURE_DRAWINGS_DIR: 'data/gesture_drawings__gd_multi/img'
 
 DATASET:
   COLOR_RGB: true
@@ -95,7 +96,7 @@ TRAIN:
   BATCH_SIZE_PER_GPU: 64
   SHUFFLE: true
   BEGIN_EPOCH: 0
-  END_EPOCH: 2
+  END_EPOCH: 5
   OPTIMIZER: adam
   LR: 0.001
   LR_FACTOR: 0.1
@@ -108,7 +109,7 @@ TRAIN:
   MOMENTUM: 0.9
   NESTEROV: false
 TEST:
-  BATCH_SIZE_PER_GPU: 32
+  BATCH_SIZE_PER_GPU: 64
   COCO_BBOX_FILE: 'data/sketch/person_detection_results/eval.json'
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
