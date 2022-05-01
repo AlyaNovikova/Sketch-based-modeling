@@ -14,7 +14,7 @@ import logging
 import torch
 import torch.nn as nn
 
-from lib.models.reverse_gradient import ReverseLayer
+from models.reverse_gradient import ReverseLayer
 
 BN_MOMENTUM = 0.1
 logger = logging.getLogger(__name__)
