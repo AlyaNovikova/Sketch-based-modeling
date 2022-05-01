@@ -10,3 +10,4 @@ external/
 draws/
 plot/
 
+__pycache__
