@@ -160,7 +160,7 @@ def main():
         pin_memory=cfg.PIN_MEMORY
     )
     valid_loader = torch.utils.data.DataLoader(
-        valid_dataset,
+        valid_dataset.dataset,
         batch_size=cfg.TEST.BATCH_SIZE_PER_GPU*len(cfg.GPUS),
         shuffle=False,
         num_workers=cfg.WORKERS,
@@ -213,26 +213,26 @@ def main():
 
 
         # evaluate on validation set
-        perf_indicator = validate(
-            cfg, valid_loader, valid_dataset, model, criterion, bce, alpha, epoch,
-            final_output_dir, tb_log_dir, writer_dict
-        )
+        # perf_indicator = validate(
+        #     cfg, valid_loader, valid_dataset.dataset, model, criterion,
+        #     final_output_dir, tb_log_dir, writer_dict
+        # )
 
-        if perf_indicator >= best_perf:
-            best_perf = perf_indicator
-            best_model = True
-        else:
-            best_model = False
+        # if perf_indicator >= best_perf:
+        #     best_perf = perf_indicator
+        #     best_model = True
+        # else:
+        #     best_model = False
 
         logger.info('=> saving checkpoint to {}'.format(final_output_dir))
-        save_checkpoint({
-            'epoch': epoch + 1,
-            'model': cfg.MODEL.NAME,
-            'state_dict': model.state_dict(),
-            'best_state_dict': model.module.state_dict(),
-            'perf': perf_indicator,
-            'optimizer': optimizer.state_dict(),
-        }, best_model, final_output_dir)
+        # save_checkpoint({
+        #     'epoch': epoch + 1,
+        #     'model': cfg.MODEL.NAME,
+        #     'state_dict': model.state_dict(),
+        #     'best_state_dict': model.module.state_dict(),
+        #     'perf': perf_indicator,
+        #     'optimizer': optimizer.state_dict(),
+        # }, best_model, final_output_dir)
 
     final_model_state_file = os.path.join(
         final_output_dir, 'final_state.pth'

@@ -37,7 +37,11 @@ def train_step(step, model, input, target, target_weight, meta, domain, criterio
     target = target.cuda(non_blocking=True)
     target_weight = target_weight.cuda(non_blocking=True)
 
-    loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+    if sum(domain == 1) == 0:
+        loss1 = 0
+    else:
+        loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+    # loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
     loss2 = bce(output, target)
     loss = loss1 + alpha * loss2
     wandb.log(
@@ -69,7 +73,11 @@ def eval_step(step, model, eval_loader, criterion, bce, alpha):
         target = target.cuda(non_blocking=True)
         target_weight = target_weight.cuda(non_blocking=True)
 
-        loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+        if sum(domain == 1) == 0:
+            loss1 = 0
+        else:
+            loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+        # loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
         loss2 = bce(output, target)
         loss = loss1 + alpha * loss2
         wandb.log(
@@ -136,7 +144,7 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
             save_debug_images(config, input, meta, target, pred * 4, output, prefix)
 
 
-def validate(config, val_loader, val_dataset, model, criterion, bce, alpha, epoch, output_dir,
+def validate(config, val_loader, val_dataset, model, criterion, output_dir,
              tb_log_dir, writer_dict=None):
     batch_time = AverageMeter()
     losses = AverageMeter()
@@ -159,7 +167,7 @@ def validate(config, val_loader, val_dataset, model, criterion, bce, alpha, epoc
         end = time.time()
         # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1')
         # print(len(val_loader))
-        for i, (input, target, target_weight, meta, domain) in enumerate(val_loader):
+        for i, (input, target, target_weight, meta) in enumerate(val_loader):
             # print('?????????????????')
             # print(i)
             # print(input)
@@ -193,23 +201,28 @@ def validate(config, val_loader, val_dataset, model, criterion, bce, alpha, epoc
             target = target.cuda(non_blocking=True)
             target_weight = target_weight.cuda(non_blocking=True)
 
-            loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
-            loss2 = bce(output, target)
-            loss = loss1 + alpha * loss2
-            wandb.log(
-                {'val/pose_loss': loss1, 'val/discriminator': loss2, 'val/sum_loss': loss},
-                step=epoch * len(val_loader) + i
-            )
+            loss = criterion(output, target, target_weight)
+
+            # if sum(domain == 1) == 0:
+            #     loss1 = 0
+            # else:
+            #     loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+            # loss2 = bce(output, target)
+            # loss = loss1 + alpha * loss2
+            # wandb.log(
+            #     {'val/pose_loss': loss1, 'val/discriminator': loss2, 'val/sum_loss': loss},
+            #     step=epoch * len(val_loader) + i
+            # )
 
             num_images = input.size(0)
             # measure accuracy and record loss
             losses.update(loss.item(), num_images)
             _, avg_acc, cnt, pred = accuracy(output.cpu().numpy(),
                                              target.cpu().numpy())
-            wandb.log(
-                {'train/acc': avg_acc},
-                step=epoch * len(val_loader) + i
-            )
+            # wandb.log(
+            #     {'train/acc': avg_acc},
+            #     step=epoch * len(val_loader) + i
+            # )
             acc.update(avg_acc, cnt)
 
             # measure elapsed time

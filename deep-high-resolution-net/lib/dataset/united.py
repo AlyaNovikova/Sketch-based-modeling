@@ -92,8 +92,8 @@ class UnitedDataset(Dataset):
             'imgnum': 0,
             'joints': np.zeros((self.num_joints, 3), dtype=np.float32),
             'joints_vis': np.zeros((self.num_joints, 3), dtype=np.float32),
-            'center': [0, 0],
-            'scale': [0, 0],
+            'center': np.zeros((2, ), dtype=np.float32),
+            'scale': np.zeros((2, ), dtype=np.float32),
             'rotation': 0,
             'score': 0
         }
