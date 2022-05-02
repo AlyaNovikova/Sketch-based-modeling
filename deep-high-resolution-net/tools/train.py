@@ -131,10 +131,13 @@ def main():
     )
 
     train_dataset = eval('dataset.' + 'united')(
-        cfg, False
+        cfg, False, cfg.DATASET.DATASET
     )
     valid_dataset = eval('dataset.' + 'united')(
-        cfg, True
+        cfg, True, cfg.DATASET.DATASET
+    )
+    valid_drawings_dataset = eval('dataset.' + 'united')(
+        cfg, True, cfg.DATASET.DRAWINGS_DATASET
     )
 
     # train_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
@@ -159,15 +162,22 @@ def main():
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY
     )
-    valid_loader = torch.utils.data.DataLoader(
-        valid_dataset.dataset,
-        batch_size=cfg.TEST.BATCH_SIZE_PER_GPU*len(cfg.GPUS),
-        shuffle=False,
+    # valid_loader = torch.utils.data.DataLoader(
+    #     valid_dataset.dataset,
+    #     batch_size=cfg.TEST.BATCH_SIZE_PER_GPU*len(cfg.GPUS),
+    #     shuffle=False,
+    #     num_workers=cfg.WORKERS,
+    #     pin_memory=cfg.PIN_MEMORY
+    # )
+    eval_loader = torch.utils.data.DataLoader(
+        valid_dataset,
+        batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
+        shuffle=True,
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY
     )
-    eval_loader = torch.utils.data.DataLoader(
-        valid_dataset,
+    eval_drawings_loader = torch.utils.data.DataLoader(
+        valid_drawings_dataset,
         batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
         shuffle=True,
         num_workers=cfg.WORKERS,
@@ -177,6 +187,7 @@ def main():
         while True:
             yield from loader
     eval_loader = infinite_iterator(eval_loader)
+    eval_drawings_loader = infinite_iterator(eval_drawings_loader)
 
     best_perf = 0.0
     best_model = False
@@ -209,7 +220,7 @@ def main():
 
         # train for one epoch
         train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
-              final_output_dir, tb_log_dir, writer_dict, eval_loader)
+              final_output_dir, tb_log_dir, writer_dict, [eval_loader, eval_drawings_loader])
 
 
         # evaluate on validation set

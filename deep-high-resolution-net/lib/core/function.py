@@ -93,7 +93,7 @@ def eval_step(step, model, eval_loader, criterion, bce, alpha):
 
 
 def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
-          output_dir, tb_log_dir, writer_dict, eval_loader):
+          output_dir, tb_log_dir, writer_dict, eval_loaders):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -119,8 +119,8 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
         end = time.time()
 
         if i % config.EVAL_FREQ == 0:
-            eval_step(epoch * len(train_loader) + i, model, eval_loader, criterion, bce, alpha)
-
+            for val_loader in eval_loaders:
+                eval_step(epoch * len(train_loader) + i, model, val_loader, criterion, bce, alpha)
 
         if i % config.PRINT_FREQ == 0:
             msg = 'Epoch: [{0}][{1}/{2}]\t' \

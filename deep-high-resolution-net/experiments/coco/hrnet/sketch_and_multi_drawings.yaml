@@ -24,6 +24,7 @@ DATASET:
   SCALE_FACTOR: 0.35
   TEST_SET: 'eval'
   TRAIN_SET: 'train'
+  DRAWINGS_DATASET: 'drawings'
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet

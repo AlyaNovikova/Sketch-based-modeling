@@ -34,7 +34,7 @@ import dataset
 import models
 
 class UnitedDataset(Dataset):
-    def __init__(self, cfg, valid_flag):
+    def __init__(self, cfg, valid_flag, dataset_name):
         normalize = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
@@ -45,11 +45,11 @@ class UnitedDataset(Dataset):
         self.valid_flag = valid_flag
 
         if self.valid_flag:
-            self.dataset = eval('dataset.'+cfg.DATASET.DATASET)(
+            self.dataset = eval('dataset.'+ dataset_name)(
                 cfg, cfg.DATASET.ROOT, cfg.DATASET.TEST_SET, False, self.transform
             )
         else:
-            self.dataset = eval('dataset.' + cfg.DATASET.DATASET)(
+            self.dataset = eval('dataset.' + dataset_name)(
                 cfg, cfg.DATASET.ROOT, cfg.DATASET.TRAIN_SET, True, self.transform
             )
 
