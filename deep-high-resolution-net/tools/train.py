@@ -220,7 +220,7 @@ def main():
 
         # train for one epoch
         train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
-              final_output_dir, tb_log_dir, writer_dict, [eval_loader, eval_drawings_loader])
+              final_output_dir, tb_log_dir, writer_dict, {'sketch_val': eval_loader, 'drawings_val': eval_drawings_loader})
 
 
         # evaluate on validation set

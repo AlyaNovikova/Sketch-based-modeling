@@ -61,7 +61,7 @@ def train_step(step, model, input, target, target_weight, meta, domain, criterio
     return loss, avg_acc, cnt, pred, output
 
 
-def eval_step(step, model, eval_loader, criterion, bce, alpha):
+def eval_step(step, model, eval_loader, criterion, bce, alpha, plot_name):
     model.eval()
 
     with torch.no_grad():
@@ -81,13 +81,13 @@ def eval_step(step, model, eval_loader, criterion, bce, alpha):
         loss2 = bce(output, target)
         loss = loss1 + alpha * loss2
         wandb.log(
-            {'eval/pose_loss': loss1, 'eval/discriminator': loss2, 'eval/sum_loss': loss},
+            {f'{plot_name}/pose_loss': loss1, f'{plot_name}/discriminator': loss2, f'{plot_name}/sum_loss': loss},
             step=step,
         )
 
         _, avg_acc, cnt, pred = accuracy(output.detach().cpu().numpy(),
                                          target.detach().cpu().numpy())
-        wandb.log({'eval/acc': avg_acc}, step=step)
+        wandb.log({f'{plot_name}/acc': avg_acc}, step=step)
 
     model.train()
 
@@ -119,8 +119,8 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
         end = time.time()
 
         if i % config.EVAL_FREQ == 0:
-            for val_loader in eval_loaders:
-                eval_step(epoch * len(train_loader) + i, model, val_loader, criterion, bce, alpha)
+            for plot_name, val_loader in eval_loaders.items():
+                eval_step(epoch * len(train_loader) + i, model, val_loader, criterion, bce, alpha, plot_name)
 
         if i % config.PRINT_FREQ == 0:
             msg = 'Epoch: [{0}][{1}/{2}]\t' \
