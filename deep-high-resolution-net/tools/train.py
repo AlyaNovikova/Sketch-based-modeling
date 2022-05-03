@@ -123,7 +123,7 @@ def main():
         use_target_weight=cfg.LOSS.USE_TARGET_WEIGHT
     ).cuda()
     bce = nn.BCEWithLogitsLoss()
-    alpha = 0
+    alpha = cfg.DISCRIMINATOR_COEFFICIENT
 
     # Data loading code
     normalize = transforms.Normalize(
