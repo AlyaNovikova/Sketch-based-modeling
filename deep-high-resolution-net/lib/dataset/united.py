@@ -52,6 +52,8 @@ class UnitedDataset(Dataset):
         #     for img_name in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir()
         # ]
 
+        print('!!!!!!1', len(self.dataset) + len(self.gesture_images))
+
         self.heatmap_size = np.array(cfg.MODEL.HEATMAP_SIZE)
         self.num_joints = 21
 
