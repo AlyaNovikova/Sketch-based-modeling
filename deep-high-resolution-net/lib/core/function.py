@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 def train_step(step, model, input, target, target_weight, meta, domain, criterion, bce, alpha, optimizer):
     # compute output
-    loss = forward(
+    loss, avg_acc, cnt, pred, output = forward(
         alpha, bce, criterion, domain, input, model, target, target_weight, 'train', step
     )
 
@@ -46,6 +46,7 @@ def train_step(step, model, input, target, target_weight, meta, domain, criterio
 
 def forward(alpha, bce, criterion, domain, input, model, target, target_weight, tag, step):
     output, d_pred = model(input)
+    domain = domain.cuda(non_blocking=True)
     target = target.cuda(non_blocking=True)
     target_weight = target_weight.cuda(non_blocking=True)
     if sum(domain == 1) == 0:
