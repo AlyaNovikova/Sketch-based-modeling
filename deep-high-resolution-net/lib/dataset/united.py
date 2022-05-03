@@ -53,6 +53,8 @@ class UnitedDataset(Dataset):
                 cfg, cfg.DATASET.ROOT, cfg.DATASET.TRAIN_SET, True, self.transform
             )
 
+        print('!!!!!!!!', dataset_name, len(self.dataset))
+
         self.gesture_images = []
         for img_name in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir():
             if img_name.is_dir():
