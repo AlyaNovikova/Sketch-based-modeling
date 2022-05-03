@@ -1,37 +1,17 @@
-import cv2
-import torch
-from torch.utils.data import Dataset
-import numpy as np
-import torchvision.transforms as transforms
 from pathlib import Path
 
-import argparse
-import os
-import pprint
-import shutil
-
+import cv2
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset
+import numpy as np
 import torch
 import torch.nn.parallel
-import torch.backends.cudnn as cudnn
 import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
-from tensorboardX import SummaryWriter
 
-import _init_paths
 from config import cfg
-from config import update_config
-from core.loss import JointsMSELoss
-from core.function import train
-from core.function import validate
-from utils.utils import get_optimizer
-from utils.utils import save_checkpoint
-from utils.utils import create_logger
-from utils.utils import get_model_summary
-
-import dataset
-import models
 
 class UnitedDataset(Dataset):
     def __init__(self, cfg, valid_flag, dataset_name, dataset_root):
@@ -44,6 +24,10 @@ class UnitedDataset(Dataset):
         ])
         self.valid_flag = valid_flag
 
+        gesture_paths = [path for path in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir() if not path.is_dir()]
+        gesture_train, gesture_test = train_test_split(gesture_paths, test_size=.15, random_state=19)
+        gesture_paths = gesture_test if self.valid_flag else gesture_train
+
         if self.valid_flag:
             self.dataset = eval('dataset.'+ dataset_name)(
                 cfg, dataset_root, cfg.DATASET.TEST_SET, False, self.transform
@@ -54,7 +38,7 @@ class UnitedDataset(Dataset):
             )
 
         self.gesture_images = []
-        for img_name in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir():
+        for img_name in gesture_paths:
             if img_name.is_dir():
                 continue
             img = cv2.imread(str(img_name))
