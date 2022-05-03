@@ -330,7 +330,7 @@ class PoseHighResolutionNet(nn.Module):
         )
 
         self.domain_discriminator = nn.Sequential(
-            ReverseLayer(),
+            ReverseLayer(extra['STOP_DISCR_GRAD']),
             nn.AdaptiveAvgPool2d(1),
             nn.Flatten(),
             nn.Linear(in_features=pre_stage_channels[0], out_features=1)

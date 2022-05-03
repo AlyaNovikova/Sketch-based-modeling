@@ -41,6 +41,7 @@ MODEL:
   - 64
   SIGMA: 2
   EXTRA:
+    STOP_DISCR_GRAD: False
     PRETRAINED_LAYERS:
     - 'conv1'
     - 'bn1'

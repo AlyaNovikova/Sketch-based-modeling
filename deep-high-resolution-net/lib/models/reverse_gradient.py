@@ -3,15 +3,16 @@ from torch.autograd import Function
 
 
 class ReverseLayer(nn.Module):
-    def forward(self, x):
-        return ReverseLayerF.apply(x)
+    def forward(self, x, stop_grad: bool = False):
+        return ReverseLayerF.apply(x, 1 - stop_grad)
 
 
 class ReverseLayerF(Function):
     @staticmethod
-    def forward(ctx, x):
+    def forward(ctx, x, alpha):
+        ctx.alpha = alpha
         return x.view_as(x)
 
     @staticmethod
     def backward(ctx, grad_output):
-        return grad_output.neg()
+        return grad_output.neg() * ctx.alpha, None
