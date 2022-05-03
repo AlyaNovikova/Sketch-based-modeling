@@ -3,8 +3,12 @@ from torch.autograd import Function
 
 
 class ReverseLayer(nn.Module):
-    def forward(self, x, stop_grad: bool = False):
-        return ReverseLayerF.apply(x, 1 - stop_grad)
+    def __init__(self, stop_grad: bool = False):
+        super().__init__()
+        self.stop_grad = stop_grad
+
+    def forward(self, x):
+        return ReverseLayerF.apply(x, 1 - self.stop_grad)
 
 
 class ReverseLayerF(Function):
