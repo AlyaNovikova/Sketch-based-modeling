@@ -32,21 +32,8 @@ logger = logging.getLogger(__name__)
 
 def train_step(step, model, input, target, target_weight, meta, domain, criterion, bce, alpha, optimizer):
     # compute output
-    output, d_pred = model(input)
-
-    target = target.cuda(non_blocking=True)
-    target_weight = target_weight.cuda(non_blocking=True)
-
-    if sum(domain == 1) == 0:
-        loss1 = 0
-    else:
-        loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
-    # loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
-    loss2 = bce(output, target)
-    loss = loss1 + alpha * loss2
-    wandb.log(
-        {'train/pose_loss': loss1, 'train/discriminator': loss2, 'train/sum_loss': loss},
-        step=step,
+    loss = forward(
+        alpha, bce, criterion, domain, input, model, target, target_weight, 'train', step
     )
 
     # compute gradient and do update step
@@ -54,9 +41,36 @@ def train_step(step, model, input, target, target_weight, meta, domain, criterio
     loss.backward()
     optimizer.step()
 
+    return loss, avg_acc, cnt, pred, output
+
+
+def forward(alpha, bce, criterion, domain, input, model, target, target_weight, tag, step):
+    output, d_pred = model(input)
+    target = target.cuda(non_blocking=True)
+    target_weight = target_weight.cuda(non_blocking=True)
+    if sum(domain == 1) == 0:
+        loss1 = 0
+    else:
+        loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+    # loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
+    loss2 = bce(output, target)
+    loss = loss1 + alpha * loss2
+
     _, avg_acc, cnt, pred = accuracy(output.detach().cpu().numpy(),
                                      target.detach().cpu().numpy())
-    wandb.log({'train/acc': avg_acc}, step=step)
+    discr_acc = (domain == d_pred >= 0).mean()
+
+    wandb.log(
+        {
+            f'{tag}/pose_loss': loss1,
+            f'{tag}/discr_loss': loss2,
+            f'{tag}/total_loss': loss,
+            f'{tag}/pose_acc': avg_acc,
+            f'{tag}/discr_acc': discr_acc,
+        },
+        step=step,
+    )
+    wandb.log({}, step=step)
 
     return loss, avg_acc, cnt, pred, output
 
@@ -66,28 +80,7 @@ def eval_step(step, model, eval_loader, criterion, bce, alpha, plot_name):
 
     with torch.no_grad():
         input, target, target_weight, meta, domain = next(eval_loader)
-
-        # compute output
-        output, d_pred = model(input)
-
-        target = target.cuda(non_blocking=True)
-        target_weight = target_weight.cuda(non_blocking=True)
-
-        if sum(domain == 1) == 0:
-            loss1 = 0
-        else:
-            loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
-        # loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
-        loss2 = bce(output, target)
-        loss = loss1 + alpha * loss2
-        wandb.log(
-            {f'{plot_name}/pose_loss': loss1, f'{plot_name}/discriminator': loss2, f'{plot_name}/sum_loss': loss},
-            step=step,
-        )
-
-        _, avg_acc, cnt, pred = accuracy(output.detach().cpu().numpy(),
-                                         target.detach().cpu().numpy())
-        wandb.log({f'{plot_name}/acc': avg_acc}, step=step)
+        forward(alpha, bce, criterion, domain, input, model, target, target_weight, plot_name, step)
 
     model.train()
 
