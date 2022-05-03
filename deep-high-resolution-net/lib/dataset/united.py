@@ -34,7 +34,7 @@ import dataset
 import models
 
 class UnitedDataset(Dataset):
-    def __init__(self, cfg, valid_flag, dataset_name):
+    def __init__(self, cfg, valid_flag, dataset_name, dataset_root):
         normalize = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
@@ -46,13 +46,12 @@ class UnitedDataset(Dataset):
 
         if self.valid_flag:
             self.dataset = eval('dataset.'+ dataset_name)(
-                cfg, cfg.DATASET.ROOT, cfg.DATASET.TEST_SET, False, self.transform
+                cfg, dataset_root, cfg.DATASET.TEST_SET, False, self.transform
             )
         else:
             self.dataset = eval('dataset.' + dataset_name)(
-                cfg, cfg.DATASET.ROOT, cfg.DATASET.TRAIN_SET, True, self.transform
+                cfg, dataset_root, cfg.DATASET.TRAIN_SET, True, self.transform
             )
-
         print('!!!!!!!!', dataset_name, len(self.dataset))
 
         self.gesture_images = []

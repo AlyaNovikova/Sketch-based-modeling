@@ -131,13 +131,13 @@ def main():
     )
 
     train_dataset = eval('dataset.' + 'united')(
-        cfg, False, cfg.DATASET.DATASET
+        cfg, False, cfg.DATASET.DATASET, cfg.DATASET.ROOT
     )
     valid_dataset = eval('dataset.' + 'united')(
-        cfg, True, cfg.DATASET.DATASET
+        cfg, True, cfg.DATASET.DATASET, cfg.DATASET.ROOT
     )
     valid_drawings_dataset = eval('dataset.' + 'united')(
-        cfg, True, cfg.DATASET.DRAWINGS_DATASET
+        cfg, True, cfg.DATASET.DRAWINGS_DATASET, cfg.DATASET.DRAWINGS_DATASET_ROOT
     )
 
     # train_dataset = eval('dataset.'+cfg.DATASET.DATASET)(

@@ -25,6 +25,7 @@ DATASET:
   TEST_SET: 'eval'
   TRAIN_SET: 'train'
   DRAWINGS_DATASET: 'drawings'
+  DRAWINGS_DATASET_ROOT: 'data/drawings'
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
