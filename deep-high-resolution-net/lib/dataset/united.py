@@ -26,8 +26,10 @@ class UnitedDataset(Dataset):
         self.valid_flag = valid_flag
 
         gesture_paths = [path for path in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir() if not path.is_dir()]
-        gesture_train, gesture_test = train_test_split(gesture_paths, test_size=.0, random_state=19)
-        gesture_paths = gesture_test if self.valid_flag else gesture_train
+        test_size = 0.0
+        if test_size != 0:
+            gesture_train, gesture_test = train_test_split(gesture_paths, test_size=test_size, random_state=19)
+            gesture_paths = gesture_test if self.valid_flag else gesture_train
 
         if self.valid_flag:
             self.dataset = eval('dataset.'+ dataset_name)(
