@@ -26,7 +26,7 @@ class UnitedDataset(Dataset):
         self.valid_flag = valid_flag
 
         gesture_paths = [path for path in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir() if not path.is_dir()]
-        gesture_train, gesture_test = train_test_split(gesture_paths, test_size=.15, random_state=19)
+        gesture_train, gesture_test = train_test_split(gesture_paths, test_size=.0, random_state=19)
         gesture_paths = gesture_test if self.valid_flag else gesture_train
 
         if self.valid_flag:
@@ -52,7 +52,7 @@ class UnitedDataset(Dataset):
         #     for img_name in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir()
         # ]
 
-        print('!!!!!!1', len(self.dataset) + len(self.gesture_images))
+        print('!!!!!!1', len(self.gesture_images))
 
         self.heatmap_size = np.array(cfg.MODEL.HEATMAP_SIZE)
         self.num_joints = 21
