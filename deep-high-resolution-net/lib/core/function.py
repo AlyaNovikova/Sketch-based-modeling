@@ -59,8 +59,8 @@ def forward(alpha, bce, criterion, domain, input, model, target, target_weight, 
 
     _, avg_acc, cnt, pred = accuracy(output.detach().cpu().numpy(),
                                      target.detach().cpu().numpy())
-    discr_acc_0 = (domain[domain == 0] == (d_pred >= 0)).float().mean()
-    discr_acc_1 = (domain[domain == 1] == (d_pred >= 0)).float().mean()
+    discr_acc_0 = (domain[domain == 0] == (d_pred[domain == 0] >= 0)).float().mean()
+    discr_acc_1 = (domain[domain == 1] == (d_pred[domain == 1] >= 0)).float().mean()
 
     wandb.log(
         {
