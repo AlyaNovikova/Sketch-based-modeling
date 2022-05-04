@@ -342,13 +342,6 @@ class PoseHighResolutionNet(nn.Module):
             nn.Conv2d(pre_stage_channels[0], pre_stage_channels[0], kernel_size=2, stride=2),
             nn.BatchNorm2d(pre_stage_channels[0]),
             nn.ReLU(),
-            nn.Conv2d(pre_stage_channels[0], pre_stage_channels[0], kernel_size=2, stride=2),
-            nn.BatchNorm2d(pre_stage_channels[0]),
-            nn.ReLU(),
-            nn.Conv2d(pre_stage_channels[0], pre_stage_channels[0], kernel_size=2, stride=2),
-            nn.BatchNorm2d(pre_stage_channels[0]),
-            nn.ReLU(),
-            nn.Flatten(),
             nn.Linear(in_features=pre_stage_channels[0] * 16, out_features=1)
         )
 
