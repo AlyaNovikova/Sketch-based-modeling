@@ -333,14 +333,17 @@ class PoseHighResolutionNet(nn.Module):
         print('?????????????????', pre_stage_channels[0])
         self.domain_discriminator = nn.Sequential(
             ReverseLayer(extra['STOP_DISCR_GRAD']),
-            nn.Conv2d(pre_stage_channels[0], pre_stage_channels[0], kernel_size=(4, 3), stride=(4, 3)),
-            nn.BatchNorm2d(pre_stage_channels[0]),
+            nn.Conv2d(pre_stage_channels[0], 2 * pre_stage_channels[0], kernel_size=(4, 3), stride=(4, 3)),
+            nn.BatchNorm2d(2 * pre_stage_channels[0]),
             nn.ReLU(),
-            nn.Conv2d(pre_stage_channels[0], pre_stage_channels[0], kernel_size=2, stride=2),
-            nn.BatchNorm2d(pre_stage_channels[0]),
+            nn.Conv2d(2 * pre_stage_channels[0], 4 * pre_stage_channels[0], kernel_size=2, stride=2),
+            nn.BatchNorm2d(4 * pre_stage_channels[0]),
             nn.ReLU(),
-            nn.Conv2d(pre_stage_channels[0], pre_stage_channels[0], kernel_size=2, stride=2),
-            nn.BatchNorm2d(pre_stage_channels[0]),
+            nn.Conv2d(4 * pre_stage_channels[0], 8 * pre_stage_channels[0], kernel_size=2, stride=2),
+            nn.BatchNorm2d(8 * pre_stage_channels[0]),
+            nn.ReLU(),
+            nn.Conv2d(8 * pre_stage_channels[0], 16 * pre_stage_channels[0], kernel_size=4, stride=4),
+            nn.BatchNorm2d(16 * pre_stage_channels[0]),
             nn.ReLU(),
             nn.Flatten(),
             nn.Linear(in_features=pre_stage_channels[0] * 16, out_features=1)
