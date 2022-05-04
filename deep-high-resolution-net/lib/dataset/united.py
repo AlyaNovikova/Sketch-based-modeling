@@ -26,7 +26,7 @@ class UnitedDataset(Dataset):
         self.valid_flag = valid_flag
 
         gesture_paths = [path for path in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir() if not path.is_dir()]
-        test_size = 0.0
+        test_size = 0.15
         if test_size != 0:
             gesture_train, gesture_test = train_test_split(gesture_paths, test_size=test_size, random_state=19)
             gesture_paths = gesture_test if self.valid_flag else gesture_train
@@ -42,8 +42,6 @@ class UnitedDataset(Dataset):
 
         self.gesture_images = []
         for img_name in gesture_paths:
-            if img_name.is_dir():
-                continue
             img = cv2.imread(str(img_name))
             img = cv2.resize(img, cfg.MODEL.IMAGE_SIZE)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
