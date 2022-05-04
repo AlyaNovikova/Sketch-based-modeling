@@ -63,7 +63,7 @@ def forward(alpha, bce, criterion, domain, input, model, target, target_weight, 
     for d_number in [0, 1]:
         d_indicator = domain == d_number
         if d_indicator.sum() > 0:
-            d_acc = (domain[d_indicator] == (d_pred[d_indicator] * (2 * d_number - 1) > 0)).float().mean()
+            d_acc = (domain[d_indicator] == (d_pred[d_indicator] > 0)).float().mean()
             wandb.log(
                 {
                     f'{tag}/disc_acc_{d_number}': d_acc,

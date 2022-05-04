@@ -140,21 +140,6 @@ def main():
         cfg, True, cfg.DATASET.DRAWINGS_DATASET, cfg.DATASET.DRAWINGS_DATASET_ROOT
     )
 
-    # train_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
-    #     cfg, cfg.DATASET.ROOT, cfg.DATASET.TRAIN_SET, True,
-    #     transforms.Compose([
-    #         transforms.ToTensor(),
-    #         normalize,
-    #     ])
-    # )
-    # valid_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
-    #     cfg, cfg.DATASET.ROOT, cfg.DATASET.TEST_SET, False,
-    #     transforms.Compose([
-    #         transforms.ToTensor(),
-    #         normalize,
-    #     ])
-    # )
-
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=cfg.TRAIN.BATCH_SIZE_PER_GPU*len(cfg.GPUS),
@@ -162,13 +147,6 @@ def main():
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY
     )
-    # valid_loader = torch.utils.data.DataLoader(
-    #     valid_dataset.dataset,
-    #     batch_size=cfg.TEST.BATCH_SIZE_PER_GPU*len(cfg.GPUS),
-    #     shuffle=False,
-    #     num_workers=cfg.WORKERS,
-    #     pin_memory=cfg.PIN_MEMORY
-    # )
     eval_loader = torch.utils.data.DataLoader(
         valid_dataset,
         batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
