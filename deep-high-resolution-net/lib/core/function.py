@@ -59,8 +59,18 @@ def forward(alpha, bce, criterion, domain, input, model, target, target_weight, 
 
     _, avg_acc, cnt, pred = accuracy(output.detach().cpu().numpy(),
                                      target.detach().cpu().numpy())
-    discr_acc_0 = (domain[domain == 0] == (d_pred[domain == 0] >= 0)).float().mean()
-    discr_acc_1 = (domain[domain == 1] == (d_pred[domain == 1] >= 0)).float().mean()
+
+    for d_number in [0, 1]:
+        d_indicator = domain == d_number
+        if d_indicator.sum() > 0:
+            d_acc = (domain[d_indicator] == (d_pred[d_indicator] * (2 * d_number - 1) > 0)).float().mean()
+            wandb.log(
+                {
+                    f'{tag}/disc_acc_{d_number}': d_acc,
+                    f'{tag}/disc_mean_logit_{d_number}': d_pred[d_indicator].mean()
+                },
+                step=step
+            )
 
     wandb.log(
         {
@@ -68,12 +78,9 @@ def forward(alpha, bce, criterion, domain, input, model, target, target_weight, 
             f'{tag}/discr_loss': loss2,
             f'{tag}/total_loss': loss,
             f'{tag}/pose_acc': avg_acc,
-            f'{tag}/discr_acc_0': discr_acc_0,
-            f'{tag}/discr_acc_1': discr_acc_1,
         },
         step=step,
     )
-    wandb.log({}, step=step)
 
     return loss, avg_acc, cnt, pred, output
 
