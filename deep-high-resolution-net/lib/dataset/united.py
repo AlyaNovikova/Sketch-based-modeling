@@ -47,7 +47,7 @@ class UnitedDataset(Dataset):
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             self.gesture_images.append(img)
 
-        self.n_repeats = len(self.dataset) / len(self.gesture_images)
+        self.n_repeats = len(self.dataset) // len(self.gesture_images)
 
         # self.gesture_images = [
         #     cv2.resize(cv2.imread(str(img_name)), cfg.MODEL.IMAGE_SIZE)
