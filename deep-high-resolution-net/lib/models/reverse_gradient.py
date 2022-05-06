@@ -8,6 +8,7 @@ class ReverseLayer(nn.Module):
         self.stop_grad = stop_grad
 
     def forward(self, x):
+        print('!!!!!!!')
         return ReverseLayerF.apply(x, 1 - self.stop_grad)
 
 
@@ -15,9 +16,10 @@ class ReverseLayerF(Function):
     @staticmethod
     def forward(ctx, x, alpha):
         ctx.alpha = alpha
+        print('forward ', alpha)
         return x.view_as(x)
 
     @staticmethod
     def backward(ctx, grad_output):
-        print(ctx.alpha)
+        print('backward', ctx.alpha)
         return grad_output.neg() * ctx.alpha, None

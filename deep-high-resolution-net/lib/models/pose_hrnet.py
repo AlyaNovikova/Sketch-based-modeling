@@ -477,6 +477,8 @@ class PoseHighResolutionNet(nn.Module):
 
         x = self.final_layer(y_list[0])
 
+        print(self.domain_discriminator)
+
         d = self.domain_discriminator(y_list[0])
         d = torch.squeeze(d, 1)
 
