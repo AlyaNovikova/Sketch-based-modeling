@@ -47,6 +47,8 @@ class UnitedDataset(Dataset):
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             self.gesture_images.append(img)
 
+        self.n_repeats = len(self.dataset) / len(self.gesture_images)
+
         # self.gesture_images = [
         #     cv2.resize(cv2.imread(str(img_name)), cfg.MODEL.IMAGE_SIZE)
         #     for img_name in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir()
@@ -64,7 +66,7 @@ class UnitedDataset(Dataset):
             input, target, target_weight, meta = self.dataset[idx]
             return input, target, target_weight, meta, 1
 
-        idx -= len(self.dataset)
+        idx = (idx - len(self.dataset)) // self.n_repeats
         target_weight = np.ones((self.num_joints, 1), dtype=np.float32)
         target = np.zeros((self.num_joints,
                            self.heatmap_size[1],
@@ -89,4 +91,4 @@ class UnitedDataset(Dataset):
         # return self.transform(self.gesture_images[idx]), target, target_weight, {}, 0
 
     def __len__(self):
-        return len(self.dataset) + len(self.gesture_images)
+        return len(self.dataset) + len(self.gesture_images) * self.n_repeats
