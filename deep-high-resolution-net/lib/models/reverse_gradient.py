@@ -26,5 +26,5 @@ class ReverseLayerF(Function):
 
 
 def my_print(*args):
-    with open('super_output', 'wa') as f:
+    with open('super_output', 'a') as f:
         f.write(' '.join(str(arg) for arg in args) + '\n')
