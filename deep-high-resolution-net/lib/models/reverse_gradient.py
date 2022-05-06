@@ -17,6 +17,7 @@ class ReverseLayerF(Function):
     def forward(ctx, x, alpha):
         ctx.alpha = alpha
         my_print('forward ', alpha)
+        print(x)
         return x
 
     @staticmethod

@@ -277,7 +277,7 @@ class PoseHighResolutionNet(nn.Module):
     def __init__(self, cfg, **kwargs):
         self.inplanes = 64
         extra = cfg['MODEL']['EXTRA']
-        super(PoseHighResolutionNet, self).__init__()
+        super().__init__()
 
         # stem net
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1,
@@ -476,8 +476,6 @@ class PoseHighResolutionNet(nn.Module):
         y_list = self.stage4(x_list)
 
         x = self.final_layer(y_list[0])
-
-        print(self.domain_discriminator)
 
         d = self.domain_discriminator(y_list[0])
         d = torch.squeeze(d, 1)
