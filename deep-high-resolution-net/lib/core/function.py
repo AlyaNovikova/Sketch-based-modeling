@@ -54,7 +54,7 @@ def forward(alpha, bce, criterion, domain, input, model, target, target_weight, 
     else:
         loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
     # loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
-    loss2 = bce(d_pred, domain.float())
+    loss2 = bce(d_pred, domain.float()* .9 + 0.05)
     loss = loss1 + alpha * loss2
 
     _, avg_acc, cnt, pred = accuracy(output.detach().cpu().numpy(),
