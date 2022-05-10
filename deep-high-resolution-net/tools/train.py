@@ -160,7 +160,7 @@ def main():
         pin_memory=cfg.PIN_MEMORY
     )
     valid_drawings_loader = torch.utils.data.DataLoader(
-        valid_drawings_dataset,
+        valid_drawings_dataset.dataset,
         batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
         shuffle=True,
         num_workers=cfg.WORKERS,
