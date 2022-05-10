@@ -261,7 +261,8 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                                   prefix)
                 wandb.log(
                     {
-                        f'{tag}/acc': acc
+                        f'{tag}/acc': acc.avg,
+                        f'{tag}/loss': losses.avg
                     },
                     step=step,
                 )
