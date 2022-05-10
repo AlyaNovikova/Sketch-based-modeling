@@ -251,13 +251,7 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                       'Accuracy {acc.val:.3f} ({acc.avg:.3f})'.format(
                           i, len(val_loader), batch_time=batch_time,
                           loss=losses, acc=acc)
-                wandb.log(
-                    {
-                        f'{tag}/acc': acc,
-                        f'{tag}/loss': losses
-                    },
-                    step=step,
-                )
+
                 logger.info(msg)
 
                 prefix = '{}_{}'.format(
@@ -265,6 +259,12 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                 )
                 save_debug_images(config, input, meta, target, pred*4, output,
                                   prefix)
+                wandb.log(
+                    {
+                        f'{tag}/acc': acc
+                    },
+                    step=step,
+                )
 
         name_values, perf_indicator = val_dataset.evaluate(
             config, all_preds, output_dir, all_boxes, image_path,
