@@ -177,7 +177,7 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
     with torch.no_grad():
         end = time.time()
         for kek in val_loader:
-            print(kek)
+            print(len(kek))
             break
 
         for i, (input, target, target_weight, meta) in enumerate(val_loader):
