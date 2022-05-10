@@ -159,7 +159,7 @@ def main():
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY
     )
-    eval_drawings_loader = torch.utils.data.DataLoader(
+    valid_drawings_loader = torch.utils.data.DataLoader(
         valid_drawings_dataset,
         batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
         shuffle=True,
@@ -172,7 +172,7 @@ def main():
             yield from loader
 
     eval_loader = infinite_iterator(eval_loader)
-    eval_drawings_loader = infinite_iterator(eval_drawings_loader)
+    eval_drawings_loader = infinite_iterator(valid_drawings_loader)
 
     best_perf = 0.0
     best_model = False
@@ -207,7 +207,7 @@ def main():
         train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
               final_output_dir, tb_log_dir, writer_dict,
               {'sketch_val': eval_loader, 'drawings_val': eval_drawings_loader},
-              eval_drawings_loader, valid_drawings_dataset)
+              valid_drawings_loader, valid_drawings_dataset)
 
         # evaluate on validation set
         # perf_indicator = validate(
