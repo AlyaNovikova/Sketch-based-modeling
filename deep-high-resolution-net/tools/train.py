@@ -175,7 +175,7 @@ def main():
         ])
     )
     valid_loader_drawings = torch.utils.data.DataLoader(
-        valid_dataset,
+        valid_dataset_drawings,
         batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
         shuffle=False,
         num_workers=cfg.WORKERS,
