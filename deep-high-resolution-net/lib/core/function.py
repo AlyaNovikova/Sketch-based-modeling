@@ -131,7 +131,7 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
 
         if i % config.VAL_DRAWINGS_FREQ == 0:
             validate(config, valid_loader, valid_dataset, model, criterion,
-                     output_dir, tb_log_dir)
+                     output_dir, tb_log_dir, 'total_val', epoch * len(train_loader) + i)
 
         if i % config.PRINT_FREQ == 0:
             msg = 'Epoch: [{0}][{1}/{2}]\t' \
@@ -156,7 +156,7 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
 
 
 def validate(config, val_loader, val_dataset, model, criterion, output_dir,
-             tb_log_dir, writer_dict=None):
+             tb_log_dir, tag, step, writer_dict=None):
     batch_time = AverageMeter()
     losses = AverageMeter()
     acc = AverageMeter()
@@ -251,6 +251,13 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                       'Accuracy {acc.val:.3f} ({acc.avg:.3f})'.format(
                           i, len(val_loader), batch_time=batch_time,
                           loss=losses, acc=acc)
+                wandb.log(
+                    {
+                        f'{tag}/acc': acc,
+                        f'{tag}/loss': losses
+                    },
+                    step=step,
+                )
                 logger.info(msg)
 
                 prefix = '{}_{}'.format(
@@ -262,6 +269,13 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
         name_values, perf_indicator = val_dataset.evaluate(
             config, all_preds, output_dir, all_boxes, image_path,
             filenames, imgnums
+        )
+
+        wandb.log(
+            {
+                f'{tag}/AP': name_values['AP']
+            },
+            step=step,
         )
 
         model_name = config.MODEL.NAME
