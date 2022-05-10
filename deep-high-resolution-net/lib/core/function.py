@@ -178,7 +178,7 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
         end = time.time()
         for i, (input, target, target_weight, meta, _) in enumerate(val_loader):
             # compute output
-            outputs = model(input)
+            outputs, _ = model(input)
             if isinstance(outputs, list):
                 output = outputs[-1]
             else:
