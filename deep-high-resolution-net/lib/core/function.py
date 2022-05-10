@@ -271,9 +271,13 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
             filenames, imgnums
         )
 
+        names = name_values.keys()
+        values = name_values.values()
+        print(name_values)
+        print('!!!!!!', names, values)
         wandb.log(
             {
-                f'{tag}/AP': name_values['AP']
+                f'{tag}/{names[0]}': values[0]
             },
             step=step,
         )
