@@ -96,7 +96,7 @@ def eval_step(step, model, eval_loader, criterion, bce, alpha, plot_name):
 
 
 def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
-          output_dir, tb_log_dir, writer_dict, eval_loaders):
+          output_dir, tb_log_dir, writer_dict, eval_loaders, valid_loader, valid_dataset):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -124,6 +124,14 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
         if i % config.EVAL_FREQ == 0:
             for plot_name, val_loader in eval_loaders.items():
                 eval_step(epoch * len(train_loader) + i, model, val_loader, criterion, bce, alpha, plot_name)
+
+        if i % config.EVAL_FREQ == 0:
+            for plot_name, val_loader in eval_loaders.items():
+                eval_step(epoch * len(train_loader) + i, model, val_loader, criterion, bce, alpha, plot_name)
+
+        if i % config.VAL_DRAWINGS_FREQ == 0:
+            validate(config, valid_loader, valid_dataset, model, criterion,
+                     output_dir, tb_log_dir)
 
         if i % config.PRINT_FREQ == 0:
             msg = 'Epoch: [{0}][{1}/{2}]\t' \
@@ -168,64 +176,46 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
     idx = 0
     with torch.no_grad():
         end = time.time()
-        # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1')
-        # print(len(val_loader))
         for i, (input, target, target_weight, meta) in enumerate(val_loader):
-            # print('?????????????????')
-            # print(i)
-            # print(input)
             # compute output
-            outputs, d_pred = model(input)
+            outputs = model(input)
             if isinstance(outputs, list):
                 output = outputs[-1]
             else:
                 output = outputs
 
-            #             if config.TEST.FLIP_TEST:
-            #                 input_flipped = input.flip(3)
-            #                 outputs_flipped = model(input_flipped)
+#             if config.TEST.FLIP_TEST:
+#                 input_flipped = input.flip(3)
+#                 outputs_flipped = model(input_flipped)
 
-            #                 if isinstance(outputs_flipped, list):
-            #                     output_flipped = outputs_flipped[-1]
-            #                 else:
-            #                     output_flipped = outputs_flipped
+#                 if isinstance(outputs_flipped, list):
+#                     output_flipped = outputs_flipped[-1]
+#                 else:
+#                     output_flipped = outputs_flipped
 
-            #                 output_flipped = flip_back(output_flipped.cpu().numpy(),
-            #                                            val_dataset.flip_pairs)
-            #                 output_flipped = torch.from_numpy(output_flipped.copy()).cuda()
+#                 output_flipped = flip_back(output_flipped.cpu().numpy(),
+#                                            val_dataset.flip_pairs)
+#                 output_flipped = torch.from_numpy(output_flipped.copy()).cuda()
 
-            #                 # feature is not aligned, shift flipped heatmap for higher accuracy
-            #                 if config.TEST.SHIFT_HEATMAP:
-            #                     output_flipped[:, :, :, 1:] = \
-            #                         output_flipped.clone()[:, :, :, 0:-1]
 
-            #                 output = (output + output_flipped) * 0.5
+#                 # feature is not aligned, shift flipped heatmap for higher accuracy
+#                 if config.TEST.SHIFT_HEATMAP:
+#                     output_flipped[:, :, :, 1:] = \
+#                         output_flipped.clone()[:, :, :, 0:-1]
+
+#                 output = (output + output_flipped) * 0.5
 
             target = target.cuda(non_blocking=True)
             target_weight = target_weight.cuda(non_blocking=True)
 
             loss = criterion(output, target, target_weight)
 
-            # if sum(domain == 1) == 0:
-            #     loss1 = 0
-            # else:
-            #     loss1 = criterion(output[domain == 1], target[domain == 1], target_weight[domain == 1])
-            # loss2 = bce(output, target)
-            # loss = loss1 + alpha * loss2
-            # wandb.log(
-            #     {'val/pose_loss': loss1, 'val/discriminator': loss2, 'val/sum_loss': loss},
-            #     step=epoch * len(val_loader) + i
-            # )
-
             num_images = input.size(0)
             # measure accuracy and record loss
             losses.update(loss.item(), num_images)
             _, avg_acc, cnt, pred = accuracy(output.cpu().numpy(),
                                              target.cpu().numpy())
-            # wandb.log(
-            #     {'train/acc': avg_acc},
-            #     step=epoch * len(val_loader) + i
-            # )
+
             acc.update(avg_acc, cnt)
 
             # measure elapsed time
@@ -244,7 +234,7 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
             # double check this all_boxes parts
             all_boxes[idx:idx + num_images, 0:2] = c[:, 0:2]
             all_boxes[idx:idx + num_images, 2:4] = s[:, 0:2]
-            all_boxes[idx:idx + num_images, 4] = np.prod(s * 200, 1)
+            all_boxes[idx:idx + num_images, 4] = np.prod(s*200, 1)
             all_boxes[idx:idx + num_images, 5] = score
             image_path.extend(meta['image'])
 
@@ -255,14 +245,15 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t' \
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t' \
                       'Accuracy {acc.val:.3f} ({acc.avg:.3f})'.format(
-                    i, len(val_loader), batch_time=batch_time,
-                    loss=losses, acc=acc)
+                          i, len(val_loader), batch_time=batch_time,
+                          loss=losses, acc=acc)
                 logger.info(msg)
 
                 prefix = '{}_{}'.format(
                     os.path.join(output_dir, 'val'), i
                 )
-                save_debug_images(config, input, meta, target, pred * 4, output, prefix)
+                save_debug_images(config, input, meta, target, pred*4, output,
+                                  prefix)
 
         name_values, perf_indicator = val_dataset.evaluate(
             config, all_preds, output_dir, all_boxes, image_path,

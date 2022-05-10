@@ -15,7 +15,7 @@ import dataset
 from config import cfg
 
 class UnitedDataset(Dataset):
-    def __init__(self, cfg, valid_flag, dataset_name, dataset_root):
+    def __init__(self, cfg, valid_flag, dataset_name, dataset_root, drawings_flag):
         normalize = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
@@ -54,8 +54,7 @@ class UnitedDataset(Dataset):
         #     for img_name in Path(cfg.GESTURE_DRAWINGS_DIR).iterdir()
         # ]
 
-        print('!!!!!!1', len(self.gesture_images))
-
+        self.drawings_flag = drawings_flag
         self.heatmap_size = np.array(cfg.MODEL.HEATMAP_SIZE)
         self.num_joints = 21
 
@@ -91,4 +90,6 @@ class UnitedDataset(Dataset):
         # return self.transform(self.gesture_images[idx]), target, target_weight, {}, 0
 
     def __len__(self):
+        if self.drawings_flag:
+            return len(self.dataset)
         return len(self.dataset) + len(self.gesture_images) * self.n_repeats

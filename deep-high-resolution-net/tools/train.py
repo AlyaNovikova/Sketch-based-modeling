@@ -90,7 +90,7 @@ def main():
     torch.backends.cudnn.deterministic = cfg.CUDNN.DETERMINISTIC
     torch.backends.cudnn.enabled = cfg.CUDNN.ENABLED
 
-    model = eval('models.'+cfg.MODEL.NAME+'.get_pose_net')(
+    model = eval('models.' + cfg.MODEL.NAME + '.get_pose_net')(
         cfg, is_train=True
     )
 
@@ -112,7 +112,7 @@ def main():
     dump_input = torch.rand(
         (1, 3, cfg.MODEL.IMAGE_SIZE[1], cfg.MODEL.IMAGE_SIZE[0])
     )
-    writer_dict['writer'].add_graph(model, (dump_input, ))
+    writer_dict['writer'].add_graph(model, (dump_input,))
 
     logger.info(get_model_summary(model, dump_input))
 
@@ -131,18 +131,23 @@ def main():
     )
 
     train_dataset = eval('dataset.' + 'united')(
-        cfg, False, cfg.DATASET.DATASET, cfg.DATASET.ROOT
+        cfg, False, cfg.DATASET.DATASET, cfg.DATASET.ROOT, False
     )
+    print('Len of train_dataset', len(train_dataset))
+
     valid_dataset = eval('dataset.' + 'united')(
-        cfg, True, cfg.DATASET.DATASET, cfg.DATASET.ROOT
+        cfg, True, cfg.DATASET.DATASET, cfg.DATASET.ROOT, False
     )
+    print('Len of valid_dataset', len(valid_dataset))
+
     valid_drawings_dataset = eval('dataset.' + 'united')(
-        cfg, True, cfg.DATASET.DRAWINGS_DATASET, cfg.DATASET.DRAWINGS_DATASET_ROOT
+        cfg, True, cfg.DATASET.DRAWINGS_DATASET, cfg.DATASET.DRAWINGS_DATASET_ROOT, True
     )
+    print('Len of valid_drawings_dataset', len(valid_drawings_dataset))
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
-        batch_size=cfg.TRAIN.BATCH_SIZE_PER_GPU*len(cfg.GPUS),
+        batch_size=cfg.TRAIN.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
         shuffle=cfg.TRAIN.SHUFFLE,
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY
@@ -161,9 +166,11 @@ def main():
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY
     )
+
     def infinite_iterator(loader):
         while True:
             yield from loader
+
     eval_loader = infinite_iterator(eval_loader)
     eval_drawings_loader = infinite_iterator(eval_drawings_loader)
 
@@ -198,8 +205,9 @@ def main():
 
         # train for one epoch
         train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
-              final_output_dir, tb_log_dir, writer_dict, {'sketch_val': eval_loader, 'drawings_val': eval_drawings_loader})
-
+              final_output_dir, tb_log_dir, writer_dict,
+              {'sketch_val': eval_loader, 'drawings_val': eval_drawings_loader},
+              eval_drawings_loader, valid_drawings_dataset)
 
         # evaluate on validation set
         # perf_indicator = validate(

@@ -329,7 +329,6 @@ class PoseHighResolutionNet(nn.Module):
             padding=1 if extra['FINAL_CONV_KERNEL'] == 3 else 0
         )
 
-        print('?????????????????', pre_stage_channels[0])
         self.domain_discriminator = nn.Sequential(
             ReverseLayer(extra['STOP_DISCR_GRAD']),
             nn.Conv2d(pre_stage_channels[0], 2 * pre_stage_channels[0], kernel_size=(4, 3), stride=(4, 3)),
