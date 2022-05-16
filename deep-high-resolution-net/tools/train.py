@@ -108,7 +108,7 @@ def main():
     }
 
     wandb.init(project='sketch')
-    print('KEEEEK', wandb.run.sweep_id)
+    print('KEEEEK', wandb.run.name, wandb.run.sweep_id, wandb.run.tags)
     print('LOOOOL', wandb.run)
 
     dump_input = torch.rand(
