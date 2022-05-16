@@ -7,8 +7,12 @@ DATA_DIR: ''
 GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
-WORKERS: 24
+WORKERS: 8
 PRINT_FREQ: 100
+EVAL_FREQ: 10
+VAL_DRAWINGS_FREQ: 300
+GESTURE_DRAWINGS_DIR: 'data/gesture_drawings__gd_multi/img'
+DISCRIMINATOR_COEFFICIENT: 1e-4
 
 DATASET:
   COLOR_RGB: true
@@ -22,6 +26,8 @@ DATASET:
   SCALE_FACTOR: 0.35
   TEST_SET: 'eval'
   TRAIN_SET: 'train'
+  DRAWINGS_DATASET: 'drawings'
+  DRAWINGS_DATASET_ROOT: 'data/drawings'
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
@@ -36,6 +42,7 @@ MODEL:
   - 64
   SIGMA: 2
   EXTRA:
+    STOP_DISCR_GRAD: True
     PRETRAINED_LAYERS:
     - 'conv1'
     - 'bn1'
@@ -91,10 +98,10 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 32
+  BATCH_SIZE_PER_GPU: 128
   SHUFFLE: true
   BEGIN_EPOCH: 0
-  END_EPOCH: 2
+  END_EPOCH: 15
   OPTIMIZER: adam
   LR: 0.001
   LR_FACTOR: 0.1
@@ -107,7 +114,7 @@ TRAIN:
   MOMENTUM: 0.9
   NESTEROV: false
 TEST:
-  BATCH_SIZE_PER_GPU: 32
+  BATCH_SIZE_PER_GPU: 512
   COCO_BBOX_FILE: 'data/sketch/person_detection_results/eval.json'
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0

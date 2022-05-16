@@ -8,8 +8,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from .mpii import MPIIDataset as mpii
-from .coco import COCODataset as coco
-from .sketch import SketchDataset as sketch
-from .drawings import DrawingsDataset as drawings
-from .united import UnitedDataset as united
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import models.pose_resnet
+import models.pose_hrnet
