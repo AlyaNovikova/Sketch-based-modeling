@@ -24,8 +24,8 @@ DATASET:
   ROOT: 'data/coco/'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
-  TEST_SET: 'val2017'
-  TRAIN_SET: 'train2017'
+  TEST_SET: 'eval'
+  TRAIN_SET: 'train'
   DRAWINGS_DATASET: 'drawings'
   DRAWINGS_DATASET_ROOT: 'data/drawings'
 MODEL:
