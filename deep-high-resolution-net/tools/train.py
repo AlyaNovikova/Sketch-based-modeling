@@ -110,6 +110,7 @@ def main():
     wandb.init(project='sketch')
     wandb_id = int(wandb.run.name[-3:])
     print('wandb id', wandb_id)
+    final_output_dir += str(wandb_id)
 
     dump_input = torch.rand(
         (1, 3, cfg.MODEL.IMAGE_SIZE[1], cfg.MODEL.IMAGE_SIZE[0])
