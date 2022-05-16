@@ -108,8 +108,8 @@ def main():
     }
 
     wandb.init(project='sketch')
-    print('KEEEEK', wandb.run.name, wandb.run.sweep_id, wandb.run.tags)
-    print('LOOOOL', wandb.run)
+    wandb_id = int(wandb.run.name[-3:])
+    print('wandb id', wandb_id)
 
     dump_input = torch.rand(
         (1, 3, cfg.MODEL.IMAGE_SIZE[1], cfg.MODEL.IMAGE_SIZE[0])
