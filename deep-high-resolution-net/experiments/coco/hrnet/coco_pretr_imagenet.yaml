@@ -26,7 +26,7 @@ DATASET:
   SCALE_FACTOR: 0.35
   TEST_SET: 'eval'
   TRAIN_SET: 'train'
-  DRAWINGS_DATASET: 'drawings'
+  DRAWINGS_DATASET: 'coco_drawings'
   DRAWINGS_DATASET_ROOT: 'data/drawings'
 MODEL:
   INIT_WEIGHTS: true
