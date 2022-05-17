@@ -15,6 +15,7 @@ GESTURE_DRAWINGS_DIR: 'data/gesture_drawings__gd_multi/img'
 DISCRIMINATOR_COEFFICIENT: 1e-4
 
 DATASET:
+  NUM_JOINTS: 17
   COLOR_RGB: true
   DATASET: 'coco'
   DATA_FORMAT: jpg
