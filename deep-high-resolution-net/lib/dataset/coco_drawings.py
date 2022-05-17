@@ -428,18 +428,33 @@ class CocoDrawingsDataset(JointsDataset):
 
         return cat_results
 
+#     def _do_python_keypoint_eval(self, res_file, res_folder):
+#         coco_dt = self.coco.loadRes(res_file)
+#         coco_eval = COCOeval(self.coco, coco_dt, 'keypoints')
+# #         coco_eval.params.kpt_oks_sigmas = np.ones(self.num_joints)
+#         coco_eval.params.kpt_oks_sigmas = np.ones(self.num_joints)
+#         sigmas = np.array([.26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87, .89, .89]) / 10.0
+#         use_sigmas = sigmas[5:]
+#         hands = [7, 11, 8, 12, 10, 14]
+#         legs = [15, 18, 16, 19, 17, 20]
+#         for i, s in zip(hands + legs, use_sigmas):
+#             coco_eval.params.kpt_oks_sigmas[i] = s
+#
+#         coco_eval.params.useSegm = None
+#         coco_eval.evaluate()
+#         coco_eval.accumulate()
+#         coco_eval.summarize()
+#
+#         stats_names = ['AP', 'Ap .5', 'AP .75', 'AP (M)', 'AP (L)', 'AR', 'AR .5', 'AR .75', 'AR (M)', 'AR (L)']
+#
+#         info_str = []
+#         for ind, name in enumerate(stats_names):
+#             info_str.append((name, coco_eval.stats[ind]))
+#
+#         return info_str
     def _do_python_keypoint_eval(self, res_file, res_folder):
         coco_dt = self.coco.loadRes(res_file)
         coco_eval = COCOeval(self.coco, coco_dt, 'keypoints')
-#         coco_eval.params.kpt_oks_sigmas = np.ones(self.num_joints)
-        coco_eval.params.kpt_oks_sigmas = np.ones(self.num_joints)
-        sigmas = np.array([.26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87, .89, .89]) / 10.0
-        use_sigmas = sigmas[5:]
-        hands = [7, 11, 8, 12, 10, 14]
-        legs = [15, 18, 16, 19, 17, 20]
-        for i, s in zip(hands + legs, use_sigmas):
-            coco_eval.params.kpt_oks_sigmas[i] = s
-
         coco_eval.params.useSegm = None
         coco_eval.evaluate()
         coco_eval.accumulate()
