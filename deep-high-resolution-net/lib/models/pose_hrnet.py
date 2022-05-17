@@ -351,7 +351,7 @@ class PoseHighResolutionNet(nn.Module):
             # nn.Conv2d(128, 64, kernel_size=1),
             nn.AdaptiveAvgPool2d(1),
             nn.Flatten(),
-            nn.Linear(in_features=256, out_features=1)
+            nn.Linear(in_features=128, out_features=1)
         )
 
         # self.domain_discriminator = nn.Sequential(
