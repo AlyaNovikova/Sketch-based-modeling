@@ -96,8 +96,7 @@ class CocoDrawingsDataset(JointsDataset):
         self.joints_weight = np.array(
             [
                 1., 1., 1., 1., 1., 1., 1., 1.2, 1.2,
-                1.5, 1.5, 1., 1., 1.2, 1.2, 1.5, 1.5,
-                1., 1., 1., 1.,
+                1.5, 1.5, 1., 1., 1.2, 1.2, 1.5, 1.5
             ],
             dtype=np.float32
         ).reshape((self.num_joints, 1))
