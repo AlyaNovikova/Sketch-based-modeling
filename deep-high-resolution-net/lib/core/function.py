@@ -165,7 +165,7 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
 
 
 def validate(config, val_loader, val_dataset, model, criterion, output_dir,
-             tb_log_dir, tag, step, writer_dict=None):
+             tb_log_dir, tag, step, writer_dict=None, wandb_flag=True):
     batch_time = AverageMeter()
     losses = AverageMeter()
     acc = AverageMeter()
@@ -268,13 +268,14 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                 )
                 save_debug_images(config, input, meta, target, pred*4, output,
                                   prefix)
-                wandb.log(
-                    {
-                        f'{tag}/acc': acc.avg,
-                        f'{tag}/loss': losses.avg
-                    },
-                    step=step,
-                )
+                if wandb_flag:
+                    wandb.log(
+                        {
+                            f'{tag}/acc': acc.avg,
+                            f'{tag}/loss': losses.avg
+                        },
+                        step=step,
+                    )
 
         name_values, perf_indicator = val_dataset.evaluate(
             config, all_preds, output_dir, all_boxes, image_path,
@@ -285,12 +286,13 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
         # values = name_values.values()
         # print(name_values)
         # print('!!!!!!', names, values)
-        wandb.log(
-            {
-                f'{tag}/AP': name_values['AP']
-            },
-            step=step,
-        )
+        if wandb_flag:
+            wandb.log(
+                {
+                    f'{tag}/AP': name_values['AP']
+                },
+                step=step,
+            )
 
         model_name = config.MODEL.NAME
         if isinstance(name_values, list):

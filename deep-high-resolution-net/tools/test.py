@@ -126,7 +126,7 @@ def main():
     #          final_output_dir, tb_log_dir)
 
     validate(cfg, valid_loader, valid_dataset, model, criterion,
-             final_output_dir, tb_log_dir, 'testing_val', 0)
+             final_output_dir, tb_log_dir, 'testing_val', 0, wandb_flag=False)
 
 
 if __name__ == '__main__':
