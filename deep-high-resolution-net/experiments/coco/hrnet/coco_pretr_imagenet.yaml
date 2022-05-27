@@ -1,4 +1,4 @@
-AUTO_RESUME: false
+AUTO_RESUME: true
 CUDNN:
   BENCHMARK: true
   DETERMINISTIC: false
@@ -15,25 +15,25 @@ GESTURE_DRAWINGS_DIR: 'data/gesture_drawings__gd_multi/img'
 DISCRIMINATOR_COEFFICIENT: 1e-4
 
 DATASET:
-  NUM_JOINTS: 21
+  NUM_JOINTS: 17
   COLOR_RGB: true
-  DATASET: 'sketch'
-  DATA_FORMAT: png
+  DATASET: 'coco'
+  DATA_FORMAT: jpg
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
-  PROB_HALF_BODY: -1.0
-  ROOT: 'data/sketch/'
+  PROB_HALF_BODY: 0.3
+  ROOT: 'data/coco/'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'eval'
   TRAIN_SET: 'train'
-  DRAWINGS_DATASET: 'drawings'
+  DRAWINGS_DATASET: 'coco_drawings'
   DRAWINGS_DATASET_ROOT: 'data/drawings'
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
-  NUM_JOINTS: 21
-  PRETRAINED: 'models/pose_hrnet_w32_256x192.pth'
+  NUM_JOINTS: 17
+  PRETRAINED: 'models/imagenet/hrnet_w32-36af842e.pth'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 192
@@ -99,7 +99,7 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 128
+  BATCH_SIZE_PER_GPU: 64
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 10
@@ -115,8 +115,8 @@ TRAIN:
   MOMENTUM: 0.9
   NESTEROV: false
 TEST:
-  BATCH_SIZE_PER_GPU: 512
-  COCO_BBOX_FILE: 'data/sketch/person_detection_results/eval.json'
+  BATCH_SIZE_PER_GPU: 128
+  COCO_BBOX_FILE: 'data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2

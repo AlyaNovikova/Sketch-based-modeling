@@ -56,7 +56,7 @@ class UnitedDataset(Dataset):
 
         self.drawings_flag = drawings_flag
         self.heatmap_size = np.array(cfg.MODEL.HEATMAP_SIZE)
-        self.num_joints = 21
+        self.num_joints = int(cfg.DATASET.NUM_JOINTS)
 
     def __getitem__(self, idx):
         if idx < len(self.dataset):

@@ -17,18 +17,18 @@ DISCRIMINATOR_COEFFICIENT: 1e-4
 DATASET:
   NUM_JOINTS: 21
   COLOR_RGB: true
-  DATASET: 'sketch'
+  DATASET: 'drawings'
   DATA_FORMAT: png
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: -1.0
-  ROOT: 'data/sketch/'
+  ROOT: 'data/single2'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'eval'
   TRAIN_SET: 'train'
   DRAWINGS_DATASET: 'drawings'
-  DRAWINGS_DATASET_ROOT: 'data/drawings'
+  DRAWINGS_DATASET_ROOT: 'data/single2'
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet

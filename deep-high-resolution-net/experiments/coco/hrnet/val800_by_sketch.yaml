@@ -17,12 +17,12 @@ DISCRIMINATOR_COEFFICIENT: 1e-4
 DATASET:
   NUM_JOINTS: 21
   COLOR_RGB: true
-  DATASET: 'sketch'
+  DATASET: 'drawings'
   DATA_FORMAT: png
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: -1.0
-  ROOT: 'data/sketch/'
+  ROOT: 'data/drawings'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'eval'

@@ -145,7 +145,7 @@ class JointsDataset(Dataset):
         if self.is_train:
             if (np.sum(joints_vis[:, 0]) > self.num_joints_half_body
                 and np.random.rand() < self.prob_half_body):
-                assert False
+                # assert False
                 c_half_body, s_half_body = self.half_body_transform(
                     joints, joints_vis
                 )

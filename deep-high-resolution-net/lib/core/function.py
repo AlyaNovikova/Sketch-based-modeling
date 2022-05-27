@@ -96,7 +96,7 @@ def eval_step(step, model, eval_loader, criterion, bce, alpha, plot_name):
 
 
 def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
-          output_dir, tb_log_dir, writer_dict, eval_loaders, valid_loader, valid_dataset):
+          output_dir, tb_log_dir, writer_dict, eval_loaders, valid_loader, valid_dataset, max_val_map):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -130,8 +130,15 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
                 eval_step(epoch * len(train_loader) + i, model, val_loader, criterion, bce, alpha, plot_name)
 
         if i % config.VAL_DRAWINGS_FREQ == 0:
-            validate(config, valid_loader, valid_dataset, model, criterion,
+            cur_ap, _ = validate(config, valid_loader, valid_dataset, model, criterion,
                      output_dir, tb_log_dir, 'total_val', epoch * len(train_loader) + i)
+
+            if cur_ap > max_val_map:
+                max_val_map = cur_ap
+                final_model_state_file = os.path.join(
+                    output_dir, 'best_val_model.pth'
+                )
+                torch.save(model.module.state_dict(), final_model_state_file)
 
         if i % config.PRINT_FREQ == 0:
             msg = 'Epoch: [{0}][{1}/{2}]\t' \
@@ -154,9 +161,11 @@ def train(config, train_loader, model, criterion, bce, alpha, optimizer, epoch,
             prefix = '{}_{}'.format(os.path.join(output_dir, 'train'), i)
             save_debug_images(config, input, meta, target, pred * 4, output, prefix)
 
+    return max_val_map
+
 
 def validate(config, val_loader, val_dataset, model, criterion, output_dir,
-             tb_log_dir, tag, step, writer_dict=None):
+             tb_log_dir, tag, step, writer_dict=None, wandb_flag=True):
     batch_time = AverageMeter()
     losses = AverageMeter()
     acc = AverageMeter()
@@ -259,13 +268,14 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                 )
                 save_debug_images(config, input, meta, target, pred*4, output,
                                   prefix)
-                wandb.log(
-                    {
-                        f'{tag}/acc': acc.avg,
-                        f'{tag}/loss': losses.avg
-                    },
-                    step=step,
-                )
+                if wandb_flag:
+                    wandb.log(
+                        {
+                            f'{tag}/acc': acc.avg,
+                            f'{tag}/loss': losses.avg
+                        },
+                        step=step,
+                    )
 
         name_values, perf_indicator = val_dataset.evaluate(
             config, all_preds, output_dir, all_boxes, image_path,
@@ -276,12 +286,13 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
         # values = name_values.values()
         # print(name_values)
         # print('!!!!!!', names, values)
-        wandb.log(
-            {
-                f'{tag}/AP': name_values['AP']
-            },
-            step=step,
-        )
+        if wandb_flag:
+            wandb.log(
+                {
+                    f'{tag}/AP': name_values['AP']
+                },
+                step=step,
+            )
 
         model_name = config.MODEL.NAME
         if isinstance(name_values, list):
@@ -318,7 +329,7 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir,
                 )
             writer_dict['valid_global_steps'] = global_steps + 1
 
-    return perf_indicator
+    return name_values['AP'], perf_indicator
 
 
 def inference(config, val_loader, val_dataset, model, criterion, output_dir,

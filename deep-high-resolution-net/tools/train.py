@@ -108,6 +108,9 @@ def main():
     }
 
     wandb.init(project='sketch')
+    wandb_id = int(wandb.run.name[-3:])
+    print('wandb id', wandb_id)
+    final_output_dir += str(wandb_id)
 
     dump_input = torch.rand(
         (1, 3, cfg.MODEL.IMAGE_SIZE[1], cfg.MODEL.IMAGE_SIZE[0])
@@ -215,14 +218,16 @@ def main():
         last_epoch=last_epoch
     )
 
+    max_val_map = 0.0
+
     for epoch in range(begin_epoch, cfg.TRAIN.END_EPOCH):
         lr_scheduler.step()
 
         # train for one epoch
-        train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
+        max_val_map = train(cfg, train_loader, model, criterion, bce, alpha, optimizer, epoch,
               final_output_dir, tb_log_dir, writer_dict,
               {'sketch_val': eval_loader, 'drawings_val': eval_drawings_loader},
-              valid_loader_drawings, valid_dataset_drawings)
+              valid_loader_drawings, valid_dataset_drawings, max_val_map)
 
         # evaluate on validation set
         # perf_indicator = validate(
